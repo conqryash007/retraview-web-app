@@ -61,7 +61,7 @@ export default function PlaceItem(props) {
             <Map
               style={{ height: "100vh", width: "100vh" }}
               center={location}
-              zoom={10}
+              zoom={15}
             />
           </Box>
         </Modal>

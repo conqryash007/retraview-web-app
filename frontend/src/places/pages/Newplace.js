@@ -78,13 +78,30 @@ const Form = () => {
     e.preventDefault();
     setOpen(true);
     clearError();
+
     try {
+      const res = await fetch(
+        `https://api.openweathermap.org/geo/1.0/direct?q=${formData.inputs.city.value}&limit=5&appid=bc1f001f849784e9587306c1b074a6ef`
+      );
+      const data = await res.json();
+
+      let cords = {
+        lat: 0,
+        lng: 0,
+      };
+      if (data.length > 1) {
+        cords.lat = data[0].lat;
+        cords.lng = data[0].lon;
+      }
+      console.log(cords);
       const formdata = new FormData();
       formdata.append("title", formData.inputs.title.value);
       formdata.append("description", formData.inputs.description.value);
       formdata.append("address", formData.inputs.address.value);
       formdata.append("image", formData.inputs.image.value);
       formdata.append("creator", auth.userId);
+      formdata.append("cords", JSON.stringify(cords));
+
       await sendRequest(
         `${process.env.REACT_APP_BACKEND_URL}/places`,
         "POST",
@@ -95,7 +112,9 @@ const Form = () => {
       );
       setOpen(false);
       navigate("/");
-    } catch (err) {}
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -131,6 +150,20 @@ const Form = () => {
         <Input
           label="Address"
           name="address"
+          type="text"
+          validator={[VALIDATOR_REQUIRE()]}
+          onInput={inputHandler}
+        />
+        <Input
+          label="State"
+          name="state"
+          type="text"
+          validator={[VALIDATOR_REQUIRE()]}
+          onInput={inputHandler}
+        />
+        <Input
+          label="City"
+          name="city"
           type="text"
           validator={[VALIDATOR_REQUIRE()]}
           onInput={inputHandler}
